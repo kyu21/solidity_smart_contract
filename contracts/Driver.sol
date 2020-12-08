@@ -310,5 +310,5 @@ contract Driver {
     /**
      * @dev Fallback function
      */
-    function() external payable {}
+    fallback () external payable {}
 }

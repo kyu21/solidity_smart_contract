@@ -1,16 +1,19 @@
 {
   "name": "driver",
   "version": "1.0.0",
-  "description": "- Kun Y: kun.yu25@myhunter.cuny.edu",
-  "main": "index.js",
+  "description": "Rideshare solidity DAPP",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "truffle test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kyu21/solidity_smart_contract.git"
   },
-  "author": "",
+  "author": "Kun Yu",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kyu21/solidity_smart_contract/issues"
