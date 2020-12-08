@@ -306,4 +306,9 @@ contract Driver {
         
         selfdestruct(driver);
     }
+
+    /**
+     * @dev Fallback function
+     */
+    function() external payable {}
 }
