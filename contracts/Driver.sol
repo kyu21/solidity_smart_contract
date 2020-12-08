@@ -52,6 +52,10 @@ contract Driver {
 
     // Events
     event ChangedLicensePlate(string oldLicensePlate, string newLicensePlate);
+    event ChangedDownPaymentPercentage(
+        uint256 oldPercentage,
+        uint256 newPercentage
+    );
 
     event StatusChanged(string indexed oldStatus, string indexed newStatus);
 
@@ -85,18 +89,13 @@ contract Driver {
 
     /**
      * @dev Creates a driver
-     * @param _licensePlate license plate of car clients should expect to be picked up in
+     * @dev Defaults to empty license plate and 10% down payment
      */
-    constructor(string memory _licensePlate, uint256 _downPaymentPercentage) {
-        require(
-            (_downPaymentPercentage >= 0) && (_downPaymentPercentage <= 100),
-            "downPaymentPercentage must be between 0 and 100."
-        );
-
+    constructor() {
         driver = msg.sender;
-        licensePlate = _licensePlate;
-        downPaymentPercentage = _downPaymentPercentage;
-        driverStatus = Status.OPEN;
+        licensePlate = "";
+        downPaymentPercentage = 10;
+        driverStatus = Status.CLOSED;
 
         numRequests = 0;
 
@@ -111,6 +110,14 @@ contract Driver {
      */
     function getLicensePlate() public view returns (string memory) {
         return licensePlate;
+    }
+
+    /**
+     * @dev Gets associated down payment percentage
+     * @return uint
+     */
+    function getDownPaymentPercentage() public view returns (uint256) {
+        return downPaymentPercentage;
     }
 
     /**
@@ -130,7 +137,7 @@ contract Driver {
     }
 
     /**
-     * @dev Creates a driver
+     * @dev Changes license plate
      * @param _licensePlate new license plate of car clients should expect to be picked up in
      */
     function changeLicensePlate(string memory _licensePlate) public onlyDriver {
@@ -138,6 +145,24 @@ contract Driver {
         licensePlate = _licensePlate;
 
         emit ChangedLicensePlate(oldLicensePlate, licensePlate);
+    }
+
+    /**
+     * @dev Changes down payment percentage
+     * @param _downPaymentPercentage new down payment percentage clients should expect to pre-pay
+     */
+    function changeDownPaymentPercentage(uint256 _downPaymentPercentage)
+        public
+        onlyDriver
+    {
+        require(
+            (_downPaymentPercentage >= 0) && (_downPaymentPercentage <= 100),
+            "downPaymentPercentage must be between 0 and 100."
+        );
+        uint256 oldPercentage = downPaymentPercentage;
+        downPaymentPercentage = _downPaymentPercentage;
+
+        emit ChangedDownPaymentPercentage(oldPercentage, downPaymentPercentage);
     }
 
     /**
