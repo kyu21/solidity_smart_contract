@@ -1,0 +1,22 @@
+{
+  "name": "driver",
+  "version": "1.0.0",
+  "description": "- Kun Y: kun.yu25@myhunter.cuny.edu",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyu21/solidity_smart_contract.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kyu21/solidity_smart_contract/issues"
+  },
+  "homepage": "https://github.com/kyu21/solidity_smart_contract#readme",
+  "dependencies": {
+    "truffle": "^5.1.56"
+  }
+}
