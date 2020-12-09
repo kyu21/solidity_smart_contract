@@ -32,7 +32,7 @@ contract Driver {
         bool riderOk; // boolean for rider to indicate the completion of a request
     }
 
-    address payable private driver; // owner address to pay out to
+    address payable public driver; // owner address to pay out to
     string licensePlate; // license plate number of associated driver/car
     uint256 downPaymentPercentage; // percent of request amount rider has to send with request
     Status driverStatus; // enum representing current driver status
@@ -103,6 +103,14 @@ contract Driver {
     }
 
     /**
+     * @dev Gets driver associated address
+     * @return string
+     */
+    function getDriverAddress() public view returns (address) {
+        return driver;
+    }
+
+    /**
      * @dev Gets associated license plate for driver/car
      * @return string
      */
@@ -127,7 +135,15 @@ contract Driver {
     }
 
     /**
-     * @dev Gets number of completed jobs by this driver
+     * @dev Gets number of requests by this driver
+     * @return uint
+     */
+    function getNumRequests() public view returns (uint256) {
+        return numRequests;
+    }
+
+    /**
+     * @dev Gets number of completed requests by this driver
      * @return uint
      */
     function getNumCompletedRequests() public view returns (uint256) {
@@ -346,7 +362,7 @@ contract Driver {
             "Only owner of request can cancel request."
         );
         require(
-            requests[requestId].status != Status.OPEN,
+            requests[requestId].status == Status.OPEN,
             "Can't cancel an ongoing or completed request."
         );
 
