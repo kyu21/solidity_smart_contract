@@ -9,7 +9,7 @@
 
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.7.0 <0.8.0;
+pragma solidity 0.5.17;
 
 /**
  * @title Driver
@@ -19,7 +19,7 @@ contract Driver {
     enum Status {OPEN, BUSY, CLOSED}
 
     struct Request {
-        address rider; // associated rider address for request
+        address payable rider; // associated rider address for request
         Status status; // enum representing request status
         int256 fromLatitude; // latitude of start location
         int256 fromLongitude; // longtitude of start location
@@ -85,13 +85,11 @@ contract Driver {
         address indexed rider
     );
 
-    event Received(address, uint256);
-
     /**
      * @dev Creates a driver
      * @dev Defaults to empty license plate and 10% down payment
      */
-    constructor() {
+    constructor() public {
         driver = msg.sender;
         licensePlate = "";
         downPaymentPercentage = 10;
@@ -167,14 +165,8 @@ contract Driver {
 
     /**
      * @dev Changes driver status to OPEN (accepting new requests)
-     * @dev Can't change driver status when driver is BUSY
      */
     function open() public onlyDriver {
-        require(
-            driverStatus != Status.BUSY,
-            "Can't change status when there is an ongoing request."
-        );
-
         Status oldStatus = driverStatus;
         driverStatus = Status.OPEN;
 
@@ -186,14 +178,8 @@ contract Driver {
 
     /**
      * @dev Changes driver status to CLOSED (stop accepting new requests)
-     * @dev Can't change driver status when driver is BUSY
      */
     function close() public onlyDriver {
-        require(
-            driverStatus != Status.BUSY,
-            "Can't change status when there is an ongoing request."
-        );
-
         Status oldStatus = driverStatus;
         driverStatus = Status.CLOSED;
 
@@ -306,6 +292,50 @@ contract Driver {
     }
 
     /**
+     * @dev Gets information about a request
+     * @param requestId id of request to query
+     */
+    function getRequest(uint256 requestId)
+        public
+        view
+        returns (
+            int256 _fromLatitude,
+            int256 _fromLongitude,
+            int256 _toLatitude,
+            int256 _toLongtitide,
+            uint256 _pickupTime,
+            uint256 _amount,
+            bool _driverOk,
+            bool _riderOk
+        )
+    {
+        require(requests[requestId].rider != address(0), "Invalid requestId");
+
+        _fromLatitude = requests[requestId].fromLatitude;
+        _fromLongitude = requests[requestId].fromLongitude;
+        _toLatitude = requests[requestId].toLatitude;
+        _toLongtitide = requests[requestId].toLongtitide;
+        _pickupTime = requests[requestId].pickupTime;
+        _amount = requests[requestId].amount;
+        _driverOk = requests[requestId].driverOk;
+        _riderOk = requests[requestId].riderOk;
+    }
+
+    /**
+     * @dev Gets status about a request
+     * @param requestId id of request to query
+     */
+    function getRequestStatus(uint256 requestId)
+        public
+        view
+        returns (string memory _status)
+    {
+        require(requests[requestId].rider != address(0), "Invalid requestId");
+
+        _status = statusStr[uint256(requests[requestId].status)];
+    }
+
+    /**
      * @dev Retracts an open sent request by the message sender
      * @dev Sets request status to CLOSED and refunds down payment
      * @param requestId id of request to modify
@@ -360,7 +390,7 @@ contract Driver {
         );
 
         requests[requestId].status = Status.CLOSED;
-        msg.sender.transfer(requests[requestId].recieved);
+        requests[requestId].rider.transfer(requests[requestId].recieved);
 
         emit RequestCancelled(requestId, requests[requestId].rider);
 
@@ -430,14 +460,7 @@ contract Driver {
     }
 
     /**
-     * @dev Receive function
-     */
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
-    }
-
-    /**
      * @dev Fallback function
      */
-    fallback() external payable {}
+    function() external payable {}
 }
